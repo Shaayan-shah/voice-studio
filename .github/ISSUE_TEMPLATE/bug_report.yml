@@ -1,0 +1,56 @@
+name: Bug report
+description: Report a reproducible problem in Voice Studio.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not include private scripts, documents, audio, credentials, or access tokens.
+  - type: input
+    id: version
+    attributes:
+      label: Voice Studio version or commit
+      placeholder: Latest main branch or commit hash
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+    validations:
+      required: true
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Voice engine
+      options:
+        - Offline Windows voices
+        - Online Edge neural voices
+        - Not applicable
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the smallest sequence that reliably reproduces the issue.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and exact error
+    validations:
+      required: true

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fa">
+    <meta name="description" content="A simple, private text-to-speech studio for documents and written work.">
+    <title>Voice Studio</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Voice Studio home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M8 7v10m8-10v10M4 10v4m16-4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </span>
+        <span>Voice Studio</span>
+      </a>
+      <div class="privacy-note"><span class="status-dot"></span> Files processed locally</div>
+    </header>
+
+    <main class="workspace">
+      <section class="intro">
+        <p class="eyebrow">TEXT TO SPEECH</p>
+        <h1>Give your words a voice.</h1>
+        <p class="intro-copy">Turn your writing into natural-sounding audio. Start with text or bring in a document.</p>
+      </section>
+
+      <div class="studio-grid">
+        <section class="panel writing-panel" aria-labelledby="script-heading">
+          <div class="panel-heading">
+            <div>
+              <p class="step-label">01 <span>YOUR SCRIPT</span></p>
+              <h2 id="script-heading">What should we say?</h2>
+            </div>
+            <button class="text-button" id="clear-button" type="button">Clear text</button>
+          </div>
+
+          <div class="dropzone" id="dropzone">
+            <input id="file-input" type="file" accept=".pdf,.docx,.txt,.md,.csv,.tsv,.log,.json,.xml,.html,.htm,.rtf,text/plain,text/html,text/markdown" hidden>
+            <span class="drop-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 15V4m0 0L8 8m4-4 4 4M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <div class="drop-copy"><strong>Drop a document here</strong><span>or <button id="browse-button" class="inline-button" type="button">browse files</button></span></div>
+            <span class="file-types">PDF, DOCX, TXT and more · Up to 20 MB</span>
+          </div>
+
+          <label class="visually-hidden" for="script-text">Text to convert to speech</label>
+          <textarea id="script-text" placeholder="Type or paste your text here…" spellcheck="true"></textarea>
+          <div class="editor-footer">
+            <span id="file-status" class="file-status" aria-live="polite"></span>
+            <span id="character-count">0 characters</span>
+          </div>
+          <p class="field-hint" id="privacy-hint">Documents and voice generation stay on this device.</p>
+        </section>
+
+        <aside class="panel settings-panel" aria-labelledby="settings-heading">
+          <div class="panel-heading settings-title">
+            <div>
+              <p class="step-label">02 <span>VOICE SETTINGS</span></p>
+              <h2 id="settings-heading">Make it yours.</h2>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="engine-select">Voice engine</label>
+            <select id="engine-select">
+              <option value="offline">Offline · Windows voices</option>
+              <option value="edge">Online · Neural voices</option>
+            </select>
+            <span class="field-hint" id="engine-hint">Runs locally with voices installed on this PC. No internet or usage quota.</span>
+          </div>
+          <div class="field">
+            <label for="language-select">Language</label>
+            <select id="language-select" disabled><option>Loading languages…</option></select>
+          </div>
+          <div class="field">
+            <label for="voice-search">Speaker</label>
+            <div class="select-search">
+              <input id="voice-search" type="search" placeholder="Search speakers" autocomplete="off">
+            </div>
+            <select id="voice-select" disabled aria-label="Speaker"><option>Loading speakers…</option></select>
+            <span class="voice-meta" id="voice-meta">Connect to load available speakers.</span>
+          </div>
+          <div class="field">
+            <label for="tone-select">Delivery</label>
+            <select id="tone-select">
+              <option value="neutral">Neutral</option>
+              <option value="warm">Warm</option>
+              <option value="calm">Calm</option>
+              <option value="bright">Bright</option>
+              <option value="energetic">Energetic</option>
+              <option value="serious">Serious</option>
+            </select>
+            <span class="field-hint">Presets adjust the pace and pitch where supported.</span>
+          </div>
+
+          <details class="advanced-settings">
+            <summary>Fine-tune voice</summary>
+            <div class="slider-field">
+              <label for="rate-range">Speed <output id="rate-value">0%</output></label>
+              <input id="rate-range" type="range" min="-30" max="30" value="0">
+              <div class="range-ends"><span>Slower</span><span>Faster</span></div>
+            </div>
+            <div class="slider-field">
+              <label for="pitch-range">Pitch <output id="pitch-value">0 Hz</output></label>
+              <input id="pitch-range" type="range" min="-25" max="25" value="0">
+              <div class="range-ends"><span>Lower</span><span>Higher</span></div>
+              <span class="field-hint" id="pitch-hint">Fine-tune the height of the speaker's voice.</span>
+            </div>
+            <div class="slider-field">
+              <label for="volume-range">Volume <output id="volume-value">0%</output></label>
+              <input id="volume-range" type="range" min="-20" max="20" value="0">
+              <div class="range-ends"><span>Quieter</span><span>Louder</span></div>
+            </div>
+          </details>
+
+          <div class="field format-field">
+            <label for="format-select">Download format</label>
+            <select id="format-select">
+              <option value="mp3">MP3 · smaller file</option>
+              <option value="wav">WAV · uncompressed</option>
+            </select>
+          </div>
+          <button class="generate-button" id="generate-button" type="button" disabled>
+            <span class="button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M8 7v10m8-10v10M4 10v4m16-4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+            <span id="generate-label">Create audio</span>
+            <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+        </aside>
+      </div>
+
+      <section class="panel player-panel" id="player-panel" hidden aria-label="Generated audio">
+        <div class="player-info">
+          <div class="player-art" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M8 7v10m8-10v10M4 10v4m16-4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div><span class="player-label">YOUR AUDIO</span><strong id="audio-filename">voice-over.mp3</strong></div>
+        </div>
+        <audio id="audio-player" controls preload="metadata"></audio>
+        <a class="download-button" id="download-link" href="#" download>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 17v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download
+        </a>
+      </section>
+
+      <footer class="page-footer">VOICE STUDIO <span>·</span> A simple space for better listening.</footer>
+    </main>
+  </body>
+</html>
