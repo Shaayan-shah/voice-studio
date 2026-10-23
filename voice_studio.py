@@ -1,3 +1,5 @@
+"""Local-first Windows text-to-speech application."""
+
 import asyncio
 import base64
 from importlib import import_module

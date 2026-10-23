@@ -97,7 +97,7 @@ The test suite uses mocked speech engines for API tests, so it does not contact 
 |   |-- favicon.svg
 |   |-- index.html
 |   `-- styles.css
-|-- Demo.py
+|-- voice_studio.py
 |-- LICENSE
 |-- README.md
 |-- requirements.txt

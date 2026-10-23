@@ -16,7 +16,7 @@ if errorlevel 1 (
     if errorlevel 1 goto setup_error
 )
 
-".venv\Scripts\python.exe" Demo.py
+".venv\Scripts\python.exe" voice_studio.py
 if errorlevel 1 (
     echo.
     echo Voice Studio stopped because of an error. See the message above.

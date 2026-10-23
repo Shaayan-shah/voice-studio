@@ -12,7 +12,7 @@ from zipfile import ZipFile
 from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
-import Demo
+import voice_studio
 
 
 TEST_VOICES = [
@@ -29,13 +29,13 @@ TEST_VOICES = [
 class TextExtractionTests(unittest.TestCase):
     def test_plain_text_strips_utf8_bom(self):
         self.assertEqual(
-            Demo._extract_text("script.txt", b"\xef\xbb\xbfHello"),
+            voice_studio._extract_text("script.txt", b"\xef\xbb\xbfHello"),
             "Hello",
         )
 
     def test_html_extraction_omits_script_and_style(self):
         document = b"<p>Readable</p><script>secret()</script><style>.x{}</style>"
-        self.assertEqual(Demo._extract_text("page.html", document), "Readable")
+        self.assertEqual(voice_studio._extract_text("page.html", document), "Readable")
 
     def test_docx_extraction_reads_paragraphs(self):
         document = BytesIO()
@@ -48,7 +48,7 @@ class TextExtractionTests(unittest.TestCase):
             )
 
         self.assertEqual(
-            Demo._extract_text("script.docx", document.getvalue()),
+            voice_studio._extract_text("script.docx", document.getvalue()),
             "First paragraph\nSecond paragraph",
         )
 
@@ -77,27 +77,27 @@ class TextExtractionTests(unittest.TestCase):
 
         self.assertIn(
             "PDF text",
-            Demo._extract_text("script.pdf", document.getvalue()),
+            voice_studio._extract_text("script.pdf", document.getvalue()),
         )
 
     def test_unsupported_extension_has_clear_error(self):
         with self.assertRaisesRegex(ValueError, "file type is not supported"):
-            Demo._extract_text("script.doc", b"contents")
+            voice_studio._extract_text("script.doc", b"contents")
 
 
 class ApiTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.offline_voices_patcher = patch(
-            "Demo.get_windows_voices", return_value=TEST_VOICES
+            "voice_studio.get_windows_voices", return_value=TEST_VOICES
         )
         cls.online_voices_patcher = patch(
-            "Demo.get_voices", return_value=TEST_VOICES
+            "voice_studio.get_voices", return_value=TEST_VOICES
         )
         cls.offline_voices_patcher.start()
         cls.online_voices_patcher.start()
         cls.server = ThreadingHTTPServer(
-            ("127.0.0.1", 0), Demo.VoiceOverHandler
+            ("127.0.0.1", 0), voice_studio.VoiceOverHandler
         )
         cls.server_thread = threading.Thread(
             target=cls.server.serve_forever, daemon=True
@@ -134,7 +134,7 @@ class ApiTests(unittest.TestCase):
         self.assertIn('id="engine-select"', page)
 
     def test_voice_list_uses_offline_engine_by_default(self):
-        with patch("Demo.get_windows_voices", return_value=TEST_VOICES):
+        with patch("voice_studio.get_windows_voices", return_value=TEST_VOICES):
             with urlopen(f"{self.base_url}/api/voices", timeout=5) as response:
                 payload = json.load(response)
         self.assertEqual(payload["voices"], TEST_VOICES)
@@ -151,7 +151,7 @@ class ApiTests(unittest.TestCase):
 
     def test_offline_generation_returns_requested_audio_format(self):
         audio = b"RIFF" + b"\x00" * 48
-        with patch("Demo._synthesize_windows", return_value=audio) as synthesize:
+        with patch("voice_studio._synthesize_windows", return_value=audio) as synthesize:
             status, headers, body = self.send_json(
                 "/api/generate",
                 {
@@ -174,7 +174,7 @@ class ApiTests(unittest.TestCase):
     def test_online_generation_returns_mp3(self):
         audio = b"ID3" + b"\x00" * 48
         with patch(
-            "Demo._synthesize", new=AsyncMock(return_value=audio)
+            "voice_studio._synthesize", new=AsyncMock(return_value=audio)
         ) as synthesize:
             status, headers, body = self.send_json(
                 "/api/generate",
@@ -201,7 +201,7 @@ class ApiTests(unittest.TestCase):
 
     def test_scripts_above_fifty_thousand_characters_are_accepted(self):
         text = "A" * 50_001
-        with patch("Demo._synthesize_windows", return_value=b"RIFF") as synthesize:
+        with patch("voice_studio._synthesize_windows", return_value=b"RIFF") as synthesize:
             status, _, _ = self.send_json(
                 "/api/generate",
                 {
